@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ボトル確認">
+  <meta name="apple-mobile-web-app-title" content="NoGas">
   <meta name="theme-color" content="#0a1628">
   <link rel="manifest" href="manifest.json">
-  <title>透析ボトル確認システム</title>
+  <title>NoGas — 透析ボトル確認</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -17,108 +17,100 @@
       --ok: #10b981; --ng: #ef4444; --warn: #f59e0b;
       --text: #e2e8f0; --muted: #64748b;
     }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; overflow: hidden; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif; }
     .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 480px; margin: 0 auto; }
-
-    /* Header */
     .header { background: linear-gradient(135deg, #0f2547, #1a3a6e); padding: max(16px, env(safe-area-inset-top)) 20px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-    .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
     .hicon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--blue), var(--cyan)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .header h1 { font-size: 16px; font-weight: 700; }
-    .header-sub { font-size: 11px; color: var(--muted); margin-left: 42px; }
-
-    /* Main */
-    .main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .header h1 { font-size: 17px; font-weight: 800; letter-spacing: 0.02em; }
+    .header-sub { font-size: 10px; color: var(--muted); margin-left: 42px; }
+    .main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 
     /* Steps */
-    .steps { display: flex; align-items: center; background: var(--surface); border-radius: 12px; padding: 12px 16px; border: 1px solid var(--border); }
-    .step { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; }
-    .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--border); color: var(--muted); transition: all 0.3s; }
-    .step.active .step-num { background: var(--blue); color: white; box-shadow: 0 0 12px rgba(59,130,246,0.5); }
+    .steps { display: flex; align-items: center; background: var(--surface); border-radius: 10px; padding: 10px 14px; border: 1px solid var(--border); }
+    .step { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 3px; }
+    .step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; background: var(--border); color: var(--muted); transition: all 0.3s; }
+    .step.active .step-num { background: var(--blue); color: white; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
     .step.done .step-num { background: var(--ok); color: white; }
-    .step-label { font-size: 9px; color: var(--muted); text-align: center; line-height: 1.3; }
+    .step-label { font-size: 9px; color: var(--muted); text-align: center; line-height: 1.2; }
     .step.active .step-label { color: var(--blue); }
     .step.done .step-label { color: var(--ok); }
-    .step-line { width: 20px; height: 2px; background: var(--border); flex-shrink: 0; margin-bottom: 14px; }
+    .step-line { width: 18px; height: 2px; background: var(--border); flex-shrink: 0; margin-bottom: 12px; }
 
     /* Danger */
-    .danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #fca5a5; line-height: 1.6; display: flex; gap: 8px; }
+    .danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4); border-radius: 10px; padding: 10px 12px; font-size: 11px; color: #fca5a5; line-height: 1.5; display: flex; gap: 6px; }
 
     /* Phase card */
-    .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-    .phase-header { padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
-    .phase-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .phase-card.disabled { opacity: 0.5; pointer-events: none; }
+    .phase-header { padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .phase-num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
     .phase-num.p1 { background: var(--blue); color: white; }
     .phase-num.p2 { background: #8b5cf6; color: white; }
     .phase-title { font-size: 13px; font-weight: 600; }
-    .phase-badge { margin-left: auto; font-size: 9px; background: var(--ok); color: white; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+    .phase-badge { margin-left: auto; font-size: 9px; background: var(--ok); color: white; padding: 2px 7px; border-radius: 8px; font-weight: 700; }
 
-    /* Video */
-    .video-wrap { position: relative; background: #000; aspect-ratio: 3/4; }
+    /* Video area — fixed height so buttons always visible */
+    .video-wrap { position: relative; background: #000; height: 200px; }
     video { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--muted); }
-    .placeholder-icon { font-size: 40px; opacity: 0.4; }
-    .placeholder-text { font-size: 12px; text-align: center; line-height: 1.6; }
+    .placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); }
+    .placeholder-icon { font-size: 32px; opacity: 0.5; }
+    .placeholder-text { font-size: 12px; text-align: center; line-height: 1.5; }
 
     /* Target ring */
     .target-ov { position: absolute; inset: 0; display: none; pointer-events: none; }
     .target-ov.on { display: flex; align-items: center; justify-content: center; }
-    .ring { width: 110px; height: 110px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.85); box-shadow: 0 0 0 2000px rgba(0,0,0,0.45); position: relative; animation: pulse 1.5s ease-in-out infinite; }
+    .ring { width: 80px; height: 80px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.85); box-shadow: 0 0 0 2000px rgba(0,0,0,0.4); position: relative; animation: pulse 1.5s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{border-color:rgba(255,255,255,0.85)}50%{border-color:rgba(255,255,255,0.3)} }
-    .ring-label { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; color: white; background: rgba(0,0,0,0.65); padding: 3px 10px; border-radius: 10px; }
+    .ring-label { position: absolute; bottom: -26px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 10px; color: white; background: rgba(0,0,0,0.65); padding: 2px 8px; border-radius: 8px; }
 
     /* Buttons */
-    .ctrl { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-    .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; letter-spacing: 0.02em; -webkit-appearance: none; }
-    .btn:active { transform: scale(0.98); }
+    .ctrl { padding: 10px 12px; display: flex; gap: 8px; }
+    .btn { flex: 1; padding: 13px 8px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: inherit; -webkit-appearance: none; }
+    .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-    .btn-blue { background: linear-gradient(135deg, var(--blue), #2563eb); color: white; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
-    .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; box-shadow: 0 4px 16px rgba(139,92,246,0.3); }
-    .btn-green { background: linear-gradient(135deg, var(--ok), #059669); color: white; box-shadow: 0 4px 16px rgba(16,185,129,0.3); }
-    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); font-size: 12px; padding: 11px; }
+    .btn-blue { background: linear-gradient(135deg, var(--blue), #2563eb); color: white; box-shadow: 0 3px 12px rgba(59,130,246,0.35); }
+    .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; box-shadow: 0 3px 12px rgba(139,92,246,0.35); }
+    .btn-green { background: linear-gradient(135deg, var(--ok), #059669); color: white; box-shadow: 0 3px 12px rgba(16,185,129,0.35); }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); font-size: 12px; }
 
-    /* Preview thumb */
-    .thumb-row { display: flex; gap: 10px; }
+    /* Thumbnails */
+    .thumb-row { display: flex; gap: 8px; }
     .thumb { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; }
     .thumb.show { display: block; }
-    .thumb img { width: 100%; height: 100px; object-fit: cover; display: block; }
-    .thumb-label { padding: 6px 8px; font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
-    .thumb-color { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
-    /* Analyzing */
-    .analyzing { display: none; padding: 18px; align-items: center; justify-content: center; gap: 12px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
-    .analyzing.show { display: flex; }
-    .spinner { width: 22px; height: 22px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Result */
-    .result { display: none; border-radius: 16px; overflow: hidden; border: 2px solid; }
-    .result.show { display: block; }
-    .result.ok { border-color: var(--ok); }
-    .result.ng { border-color: var(--ng); }
-    .result.warn { border-color: var(--warn); }
-    .result-banner { padding: 20px; display: flex; align-items: center; gap: 16px; }
-    .result.ok .result-banner { background: rgba(16,185,129,0.15); }
-    .result.ng .result-banner { background: rgba(239,68,68,0.15); }
-    .result.warn .result-banner { background: rgba(245,158,11,0.15); }
-    .result-icon { font-size: 52px; line-height: 1; }
-    .result-title { font-size: 30px; font-weight: 900; letter-spacing: -0.02em; }
-    .result.ok .result-title { color: var(--ok); }
-    .result.ng .result-title { color: var(--ng); }
-    .result.warn .result-title { color: var(--warn); }
-    .result-sub { font-size: 13px; margin-top: 4px; font-weight: 600; }
-    .result-detail { padding: 14px 20px; font-size: 13px; line-height: 1.8; color: var(--muted); border-top: 1px solid var(--border); background: var(--card); }
-    .result-detail strong { color: var(--text); }
-
-    /* Color pills */
-    .color-pills { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-    .pill { display: flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .thumb img { width: 100%; height: 80px; object-fit: cover; display: block; }
+    .thumb-label { padding: 5px 8px; font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
     .dot.pink { background: #ec4899; }
     .dot.blue { background: #3b82f6; }
     .dot.unknown { background: var(--muted); }
 
-    .footer { padding: 10px 16px max(10px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; text-align: center; font-size: 10px; color: var(--muted); }
+    /* Analyzing */
+    .analyzing { display: none; padding: 16px; align-items: center; justify-content: center; gap: 10px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); }
+    .analyzing.show { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Result */
+    .result { display: none; border-radius: 14px; overflow: hidden; border: 2px solid; }
+    .result.show { display: block; }
+    .result.ok { border-color: var(--ok); }
+    .result.ng { border-color: var(--ng); }
+    .result.warn { border-color: var(--warn); }
+    .result-banner { padding: 18px; display: flex; align-items: center; gap: 14px; }
+    .result.ok .result-banner { background: rgba(16,185,129,0.15); }
+    .result.ng .result-banner { background: rgba(239,68,68,0.15); }
+    .result.warn .result-banner { background: rgba(245,158,11,0.15); }
+    .result-icon { font-size: 48px; line-height: 1; }
+    .result-title { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; }
+    .result.ok .result-title { color: var(--ok); }
+    .result.ng .result-title { color: var(--ng); }
+    .result.warn .result-title { color: var(--warn); }
+    .result-sub { font-size: 12px; margin-top: 3px; font-weight: 600; }
+    .result-detail { padding: 12px 18px; font-size: 12px; line-height: 1.8; color: var(--muted); border-top: 1px solid var(--border); background: var(--card); }
+    .result-detail strong { color: var(--text); }
+
+    .footer { padding: 8px 16px max(8px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; text-align: center; font-size: 10px; color: var(--muted); }
     #canvas1, #canvas2 { display: none; }
   </style>
 </head>
@@ -127,14 +119,13 @@
   <div class="header">
     <div class="header-top">
       <div class="hicon">🧪</div>
-      <h1>透析ボトル確認システム</h1>
+      <h1>NoGas — ボトル確認</h1>
     </div>
     <div class="header-sub">機器ラベル → ボトルラベルの色を照合して取り違えを防止</div>
   </div>
 
   <div class="main">
 
-    <!-- Steps -->
     <div class="steps">
       <div class="step active" id="step1">
         <div class="step-num">1</div>
@@ -152,12 +143,11 @@
       </div>
     </div>
 
-    <!-- Danger -->
     <div class="danger">
-      ⚠️ <span><strong>混合厳禁：</strong>酢酸と次亜塩素酸を混合すると<strong>塩素ガスが発生</strong>します。補充前に必ず色を確認してください。</span>
+      ⚠️ <span><strong>混合厳禁：</strong>酢酸と次亜塩素酸を混合すると<strong>塩素ガスが発生</strong>します。補充前に必ず色を確認！</span>
     </div>
 
-    <!-- Phase 1: Machine -->
+    <!-- Phase 1 -->
     <div class="phase-card" id="card1">
       <div class="phase-header">
         <div class="phase-num p1">1</div>
@@ -168,21 +158,21 @@
         <video id="video1" autoplay playsinline muted></video>
         <div class="placeholder" id="ph1">
           <div class="placeholder-icon">🏥</div>
-          <div class="placeholder-text">補充口のラベルを<br>カメラで撮影してください</div>
+          <div class="placeholder-text">下の青いボタンを押して<br>カメラを起動してください</div>
         </div>
         <div class="target-ov" id="ov1">
-          <div class="ring"><div class="ring-label">ラベルをここに合わせる</div></div>
+          <div class="ring"><div class="ring-label">ラベルを合わせる</div></div>
         </div>
       </div>
       <div class="ctrl">
-        <button class="btn btn-blue" id="btn-start1" onclick="startCam(1)">📷 カメラを起動（機器側）</button>
+        <button class="btn btn-blue" id="btn-start1" onclick="startCam(1)">📷 カメラ起動（機器）</button>
         <button class="btn btn-green" id="btn-cap1" onclick="capture(1)" style="display:none;">📸 撮影する</button>
         <button class="btn btn-ghost" id="btn-stop1" onclick="stopCam(1)" style="display:none;">✕ 停止</button>
       </div>
     </div>
 
-    <!-- Phase 2: Bottle -->
-    <div class="phase-card" id="card2" style="opacity:0.5; pointer-events:none;">
+    <!-- Phase 2 -->
+    <div class="phase-card disabled" id="card2">
       <div class="phase-header">
         <div class="phase-num p2">2</div>
         <div class="phase-title">新品ボトルのラベルを撮影</div>
@@ -194,41 +184,33 @@
           <div class="placeholder-text">機器撮影後に<br>ボトルを撮影してください</div>
         </div>
         <div class="target-ov" id="ov2">
-          <div class="ring"><div class="ring-label">ラベルをここに合わせる</div></div>
+          <div class="ring"><div class="ring-label">ラベルを合わせる</div></div>
         </div>
       </div>
       <div class="ctrl">
-        <button class="btn btn-purple" id="btn-start2" onclick="startCam(2)">📷 カメラを起動（ボトル側）</button>
+        <button class="btn btn-purple" id="btn-start2" onclick="startCam(2)">📷 カメラ起動（ボトル）</button>
         <button class="btn btn-green" id="btn-cap2" onclick="capture(2)" style="display:none;">📸 撮影する</button>
         <button class="btn btn-ghost" id="btn-stop2" onclick="stopCam(2)" style="display:none;">✕ 停止</button>
       </div>
     </div>
 
-    <!-- Preview thumbnails -->
+    <!-- Thumbnails -->
     <div class="thumb-row">
       <div class="thumb" id="thumb1">
         <img id="img1" alt="機器">
-        <div class="thumb-label">
-          <div class="thumb-color dot" id="dot1"></div>
-          <span id="label1">機器ラベル</span>
-        </div>
+        <div class="thumb-label"><div class="dot" id="dot1"></div><span id="label1">機器ラベル</span></div>
       </div>
       <div class="thumb" id="thumb2">
         <img id="img2" alt="ボトル">
-        <div class="thumb-label">
-          <div class="thumb-color dot" id="dot2"></div>
-          <span id="label2">ボトルラベル</span>
-        </div>
+        <div class="thumb-label"><div class="dot" id="dot2"></div><span id="label2">ボトルラベル</span></div>
       </div>
     </div>
 
-    <!-- Analyzing -->
     <div class="analyzing" id="analyzing">
       <div class="spinner"></div>
-      <span style="font-size:13px;color:var(--muted);">ラベルの色を照合しています...</span>
+      <span style="font-size:12px;color:var(--muted);">ラベルの色を照合しています...</span>
     </div>
 
-    <!-- Result -->
     <div class="result" id="result">
       <div class="result-banner">
         <div class="result-icon" id="r-icon"></div>
@@ -240,12 +222,11 @@
       <div class="result-detail" id="r-detail"></div>
     </div>
 
-    <!-- Reset -->
-    <button class="btn btn-ghost" id="btn-reset" onclick="resetAll()" style="display:none;">🔄 最初からやり直す</button>
-    <div style="height:8px;"></div>
+    <button class="btn btn-ghost" id="btn-reset" onclick="resetAll()" style="display:none; width:100%; padding:13px;">🔄 最初からやり直す</button>
+    <div style="height:6px;"></div>
   </div>
 
-  <div class="footer">透析器洗浄ボトル取り違え防止システム v3.0 — 完全無料・オフライン動作</div>
+  <div class="footer">NoGas v1.0 — 完全無料・オフライン動作</div>
 </div>
 
 <canvas id="canvas1"></canvas>
@@ -255,10 +236,8 @@
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
   let streams = [null, null];
-  let colors = [null, null];  // 'pink' | 'blue' | 'unknown'
-
+  let colors = [null, null];
   const COLOR_NAMES = { pink: 'ピンク（Sanacide-XP）', blue: '青（ECO-200）', unknown: '判定不能' };
-  const DOT_CLASS = { pink: 'dot pink', blue: 'dot blue', unknown: 'dot unknown' };
 
   async function startCam(n) {
     const i = n - 1;
@@ -276,15 +255,14 @@
       document.getElementById('btn-stop' + n).style.display = 'block';
       hideResult();
     } catch(e) {
-      alert('カメラへのアクセスができませんでした。\nブラウザの設定でカメラを許可してください。\n' + e.message);
+      alert('カメラへのアクセスができませんでした。\nSafariの設定でカメラを許可してください。\n\n設定 → Safari → カメラ → 許可\n\nエラー: ' + e.message);
     }
   }
 
   function stopCam(n) {
     const i = n - 1;
     if (streams[i]) { streams[i].getTracks().forEach(t => t.stop()); streams[i] = null; }
-    const v = document.getElementById('video' + n);
-    v.style.display = 'none';
+    document.getElementById('video' + n).style.display = 'none';
     document.getElementById('ph' + n).style.display = 'flex';
     document.getElementById('ov' + n).classList.remove('on');
     document.getElementById('btn-start' + n).style.display = 'block';
@@ -298,30 +276,18 @@
     const c = document.getElementById('canvas' + n);
     c.width = v.videoWidth; c.height = v.videoHeight;
     c.getContext('2d').drawImage(v, 0, 0);
-
-    // Show thumbnail
     document.getElementById('img' + n).src = c.toDataURL('image/jpeg', 0.8);
     document.getElementById('thumb' + n).classList.add('show');
-
     stopCam(n);
-
-    // Analyze color
     const color = analyzeColor(c);
     colors[i] = color;
-
-    // Update dot and label
-    document.getElementById('dot' + n).className = DOT_CLASS[color];
-    document.getElementById('label' + n).textContent =
-      (n === 1 ? '機器：' : 'ボトル：') + COLOR_NAMES[color];
-
+    const dotEl = document.getElementById('dot' + n);
+    dotEl.className = 'dot ' + (color === 'pink' ? 'pink' : color === 'blue' ? 'blue' : 'unknown');
+    document.getElementById('label' + n).textContent = (n === 1 ? '機器：' : 'ボトル：') + COLOR_NAMES[color];
     if (n === 1) {
-      // Enable phase 2
-      const card2 = document.getElementById('card2');
-      card2.style.opacity = '1';
-      card2.style.pointerEvents = 'auto';
+      document.getElementById('card2').classList.remove('disabled');
       setStep(2);
     } else {
-      // Both captured — show result
       setStep(3);
       document.getElementById('analyzing').classList.add('show');
       setTimeout(() => {
@@ -360,40 +326,26 @@
     const c1 = colors[0], c2 = colors[1];
     const el = document.getElementById('result');
     el.className = 'result show';
-
-    const n1 = COLOR_NAMES[c1] || '不明';
-    const n2 = COLOR_NAMES[c2] || '不明';
-
+    const n1 = COLOR_NAMES[c1], n2 = COLOR_NAMES[c2];
     if (c1 === 'unknown' || c2 === 'unknown') {
       el.classList.add('warn');
       document.getElementById('r-icon').textContent = '⚠️';
       document.getElementById('r-title').textContent = '再撮影';
       document.getElementById('r-sub').textContent = 'ラベルの色が判定できませんでした';
-      document.getElementById('r-detail').innerHTML =
-        `ラベルが鮮明に写るよう、<strong>丸のガイドにラベルを合わせ</strong>て再撮影してください。<br><br>
-        ・明るい場所で撮影する<br>・光の反射を避ける<br>・ラベルに近づいて撮影する`;
+      document.getElementById('r-detail').innerHTML = 'ラベルを<strong>丸のガイドに合わせて</strong>再撮影してください。<br>明るい場所で、ラベルに近づいて撮影すると判定しやすくなります。';
     } else if (c1 === c2) {
       el.classList.add('ok');
       document.getElementById('r-icon').textContent = '✅';
       document.getElementById('r-title').textContent = '一致！';
-      document.getElementById('r-sub').textContent = '正しいボトルです。補充を続けてください。';
-      document.getElementById('r-detail').innerHTML =
-        `<strong>機器ラベル：</strong>${n1}<br>
-        <strong>ボトルラベル：</strong>${n2}<br><br>
-        ✅ 色が一致しています。補充してください。`;
+      document.getElementById('r-sub').textContent = '正しいボトルです。補充してください。';
+      document.getElementById('r-detail').innerHTML = '<strong>機器ラベル：</strong>' + n1 + '<br><strong>ボトルラベル：</strong>' + n2 + '<br><br>✅ 色が一致しています。安全に補充できます。';
     } else {
       el.classList.add('ng');
       document.getElementById('r-icon').textContent = '❌';
       document.getElementById('r-title').textContent = '取り違え！';
       document.getElementById('r-sub').textContent = '直ちに補充を中止してください！';
-      document.getElementById('r-detail').innerHTML =
-        `<strong>⚠️ 危険：ラベルの色が一致しません！</strong><br><br>
-        <strong>機器ラベル：</strong>${n1}<br>
-        <strong>ボトルラベル：</strong>${n2}<br><br>
-        🚨 <strong>混合すると塩素ガスが発生します。</strong><br>
-        補充を中止し、正しいボトルを確認してください。`;
+      document.getElementById('r-detail').innerHTML = '<strong>⚠️ 危険：ラベルの色が一致しません！</strong><br><br><strong>機器ラベル：</strong>' + n1 + '<br><strong>ボトルラベル：</strong>' + n2 + '<br><br>🚨 <strong>混合すると塩素ガスが発生します。</strong><br>補充を中止し、正しいボトルを確認してください。';
     }
-
     setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
   }
 
@@ -405,9 +357,9 @@
   function resetAll() {
     stopCam(1); stopCam(2);
     colors = [null, null];
-    ['thumb1','thumb2'].forEach(id => document.getElementById(id).classList.remove('show'));
-    document.getElementById('card2').style.opacity = '0.5';
-    document.getElementById('card2').style.pointerEvents = 'none';
+    document.getElementById('thumb1').classList.remove('show');
+    document.getElementById('thumb2').classList.remove('show');
+    document.getElementById('card2').classList.add('disabled');
     hideResult();
     document.getElementById('btn-reset').style.display = 'none';
     setStep(1);
