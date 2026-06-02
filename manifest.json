@@ -2,21 +2,16 @@
   "name": "NoGas — 透析ボトル確認",
   "short_name": "NoGas",
   "description": "透析器洗浄ボトルの取り違え防止アプリ",
-  "start_url": "/dialysis-check/index.html",
-  "scope": "/dialysis-check/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#0a1628",
   "theme_color": "#0a1628",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192x192/0a1628/3b82f6?text=NG",
+      "src": "icon.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://via.placeholder.com/512x512/0a1628/3b82f6?text=NG",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
