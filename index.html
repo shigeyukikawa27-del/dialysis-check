@@ -41,23 +41,13 @@
     .placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--muted); padding: 20px; }
     .placeholder-icon { font-size: 44px; opacity: 0.4; }
     .placeholder-title { font-size: 15px; font-weight: 700; color: var(--text); text-align: center; }
-    .placeholder-sub { font-size: 12px; text-align: center; line-height: 1.7; }
-
-    /* ラベル部分を狙う小さめのガイド枠 */
+    .placeholder-sub { font-size: 12px; text-align: center; line-height: 1.8; }
     .guide-wrap { position: absolute; inset: 0; display: none; pointer-events: none; }
     .guide-wrap.on { display: flex; align-items: center; justify-content: center; }
-    .guide-box {
-      width: 60%; height: 40%;
-      border: 3px solid #facc15;
-      border-radius: 10px;
-      box-shadow: 0 0 0 2000px rgba(0,0,0,0.5);
-      position: relative;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{border-color:#facc15;box-shadow:0 0 0 2000px rgba(0,0,0,0.5)}50%{border-color:#fde047;box-shadow:0 0 0 2000px rgba(0,0,0,0.35)} }
-    .guide-label { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; color: white; background: rgba(0,0,0,0.75); padding: 3px 12px; border-radius: 20px; }
-    .guide-tip { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 10px; color: #facc15; background: rgba(0,0,0,0.75); padding: 2px 10px; border-radius: 20px; }
-
+    .guide-box { width: 70%; height: 50%; border: 3px solid #facc15; border-radius: 10px; box-shadow: 0 0 0 2000px rgba(0,0,0,0.45); position: relative; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{border-color:#facc15}50%{border-color:#fde047} }
+    .guide-label { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; color: white; background: rgba(0,0,0,0.75); padding: 3px 12px; border-radius: 20px; }
+    .guide-tip { position: absolute; top: -28px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 10px; color: #facc15; background: rgba(0,0,0,0.75); padding: 2px 10px; border-radius: 20px; }
     .phase-label { position: absolute; top: 10px; left: 0; right: 0; display: none; justify-content: center; pointer-events: none; }
     .phase-badge { background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 700; color: white; }
     .thumbs { position: absolute; bottom: 10px; left: 10px; display: flex; gap: 8px; }
@@ -116,13 +106,13 @@
     <div class="placeholder" id="placeholder">
       <div class="placeholder-icon" id="ph-icon">🏥</div>
       <div class="placeholder-title" id="ph-title">機器側のラベルを撮影</div>
-      <div class="placeholder-sub" id="ph-sub">下の青いボタンでカメラを起動し<br>⚠️ <strong style="color:#facc15;">ラベルの色部分だけ</strong>を<br>黄色い枠内に近づいて撮影してください</div>
+      <div class="placeholder-sub" id="ph-sub">下の青いボタンでカメラを起動<br>📌 <strong style="color:#facc15;">ラベルの色の部分</strong>を<br>黄色い枠いっぱいに近づけて撮影</div>
     </div>
     <div class="phase-label" id="phase-label"><div class="phase-badge" id="phase-badge"></div></div>
     <div class="guide-wrap" id="guide-wrap">
       <div class="guide-box">
-        <div class="guide-tip">⚠️ ラベルの色部分だけを枠に入れる</div>
-        <div class="guide-label">近づいてラベルの色部分を枠内に合わせる</div>
+        <div class="guide-tip">ラベルの色部分を枠いっぱいに</div>
+        <div class="guide-label">近づけて撮影してください</div>
       </div>
     </div>
     <div class="thumbs">
@@ -146,7 +136,6 @@
     <button class="btn btn-ghost" id="sub-btn" onclick="subAction()" style="display:none;">✕ 停止</button>
   </div>
 </div>
-
 <canvas id="canvas" style="display:none;"></canvas>
 
 <script>
@@ -160,7 +149,7 @@
   const COLOR_INFO = {
     navy:    { name: '濃紺色', product: 'Sanacide-XP（酢酸系）', dotStyle: 'background:#1a3a6e;' },
     green:   { name: '濃緑色', product: 'ECO-200（塩素系）',     dotStyle: 'background:#1a5c2a;' },
-    unknown: { name: '判定不能', product: '不明',               dotStyle: 'background:#64748b;' }
+    unknown: { name: '判定不能', product: '不明',                dotStyle: 'background:#64748b;' }
   };
 
   function mainAction() {
@@ -188,7 +177,7 @@
       document.getElementById('phase-label').style.display = 'flex';
       document.getElementById('guide-wrap').classList.add('on');
       document.getElementById('phase-badge').textContent =
-        phase === 'machine' ? '📷 機器のラベル色部分を枠内に' : '📷 ボトルのラベル色部分を枠内に';
+        phase === 'machine' ? '📷 機器ラベルの色部分を枠いっぱいに' : '📷 ボトルラベルの色部分を枠いっぱいに';
       setState(phase === 'machine' ? STATE.MACHINE_CAM : STATE.BOTTLE_CAM);
     } catch(e) {
       alert('カメラを起動できませんでした。\n設定 → Safari → カメラ → 許可\nにしてから再度お試しください。');
@@ -198,8 +187,7 @@
   function stopCam() {
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
     const v = document.getElementById('video');
-    v.style.display = 'none';
-    v.srcObject = null;
+    v.style.display = 'none'; v.srcObject = null;
     document.getElementById('guide-wrap').classList.remove('on');
     document.getElementById('phase-label').style.display = 'none';
   }
@@ -223,72 +211,80 @@
       document.getElementById('placeholder').style.display = 'flex';
       document.getElementById('ph-icon').textContent = '🧴';
       document.getElementById('ph-title').textContent = 'ボトルのラベルを撮影';
-      document.getElementById('ph-sub').textContent = '下の紫のボタンでカメラを起動し\n⚠️ ラベルの色部分だけを\n黄色い枠内に近づいて撮影してください';
+      document.getElementById('ph-sub').textContent = '下の紫のボタンでカメラを起動\n📌 ラベルの色の部分を\n黄色い枠いっぱいに近づけて撮影';
       setState(STATE.BOTTLE_READY);
     } else {
       setState(STATE.RESULT);
       document.getElementById('placeholder').style.display = 'none';
       document.getElementById('loading').classList.add('show');
-      setTimeout(() => {
-        document.getElementById('loading').classList.remove('show');
-        showResult();
-      }, 700);
+      setTimeout(() => { document.getElementById('loading').classList.remove('show'); showResult(); }, 700);
     }
   }
 
   // ====================================================
-  // 色判定：画像中央の枠内だけを分析
-  // ラベルの「濃い色部分」のみを抽出
-  // 薄い色（ボトル本体・白・薄黄色）は完全除外
+  // HSV色相（Hue）を使った色判定
+  // 明るさ・照明に左右されない堅牢な方法
+  // 濃紺：色相200〜260度
+  // 濃緑：色相90〜165度
   // ====================================================
+  function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    const s = max === 0 ? 0 : d / max;
+    const v = max;
+    if (d !== 0) {
+      if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+      else if (max === g) h = ((b - r) / d + 2) / 6;
+      else h = ((r - g) / d + 4) / 6;
+    }
+    return { h: h * 360, s, v };
+  }
+
   function analyzeColor(canvas) {
     const ctx = canvas.getContext('2d');
     const w = canvas.width, h = canvas.height;
 
-    // 画像中央60%×40%の範囲のみ分析（枠に対応）
-    const x0 = Math.floor(w * 0.20);
-    const x1 = Math.floor(w * 0.80);
-    const y0 = Math.floor(h * 0.30);
-    const y1 = Math.floor(h * 0.70);
-
+    // 画像全体をスキャン（広めに）
     let navy = 0, green = 0, total = 0;
 
-    for (let y = y0; y < y1; y += 4) {
-      for (let x = x0; x < x1; x += 4) {
+    for (let y = 0; y < h; y += 5) {
+      for (let x = 0; x < w; x += 5) {
         const p = ctx.getImageData(x, y, 1, 1).data;
-        const r = p[0], g = p[1], b = p[2];
+        const hsv = rgbToHsv(p[0], p[1], p[2]);
 
-        const max = Math.max(r, g, b);
-        const min = Math.min(r, g, b);
-
-        // 明るすぎる（白・薄い色）を除外：max > 180はスキップ
-        if (max > 180) continue;
-        // 暗すぎる（黒）を除外
-        if (max < 35) continue;
-
-        // 彩度が低い（グレー系）を除外
-        const sat = (max - min) / max;
-        if (sat < 0.30) continue;
+        // 彩度0.2以上（白・グレーを除外）
+        // 明度0.1〜0.9（真っ黒・真っ白を除外）
+        if (hsv.s < 0.20 || hsv.v < 0.10 || hsv.v > 0.92) continue;
 
         total++;
 
-        // 濃緑判定：Gが最大チャンネルで、BよりGが明確に大きい
-        // ECO-200ラベル: G≈100-140, R≈25-50, B≈40-70
-        if (g === max && g > b + 25 && g > r + 20) green++;
+        // 濃緑：色相90〜165度（草色〜深緑）
+        if (hsv.h >= 90 && hsv.h <= 165) green++;
 
-        // 濃紺判定：Bが最大チャンネルで、GよりBが明確に大きい
-        // Sanacide-XPラベル: B≈80-120, R≈20-45, G≈35-70
-        if (b === max && b > g + 20 && b > r + 15 && r < 100) navy++;
+        // 濃紺：色相200〜265度（青〜紺）
+        if (hsv.h >= 200 && hsv.h <= 265) navy++;
       }
     }
 
-    console.log(`解析ピクセル数: ${total} | 緑: ${green}(${total?((green/total)*100).toFixed(1):0}%) | 紺: ${navy}(${total?((navy/total)*100).toFixed(1):0}%)`);
+    const nr = total > 0 ? navy / total : 0;
+    const gr = total > 0 ? green / total : 0;
+    console.log(`合計:${total} | 緑:${green}(${(gr*100).toFixed(1)}%) | 紺:${navy}(${(nr*100).toFixed(1)}%)`);
 
-    if (total < 15) return 'unknown';
-    const nr = navy / total, gr = green / total;
-    if (gr < 0.06 && nr < 0.06) return 'unknown';
+    // 有効ピクセルが少なすぎる場合
+    if (total < 8) return 'unknown';
+
+    // どちらも閾値以下なら判定不能
+    if (gr < 0.04 && nr < 0.04) return 'unknown';
+
+    // 緑が紺の1.2倍以上 → 緑
     if (gr > nr * 1.2) return 'green';
+
+    // 紺が緑の1.2倍以上 → 紺
     if (nr > gr * 1.2) return 'navy';
+
     return 'unknown';
   }
 
@@ -302,19 +298,22 @@
       document.getElementById('r-icon').textContent = '⚠️';
       document.getElementById('r-title').textContent = '再撮影';
       document.getElementById('r-sub').textContent = 'ラベルの色部分が判定できませんでした';
-      document.getElementById('r-detail').textContent = 'ラベルの濃い色部分だけが\n黄色い枠内に入るよう\nカメラを近づけて再撮影してください';
+      document.getElementById('r-detail').textContent =
+        'ラベルの色の部分だけを\n黄色い枠いっぱいになるよう\nカメラをラベルに近づけて撮影してください';
     } else if (c1 === c2) {
       overlay.classList.add('ok');
       document.getElementById('r-icon').textContent = '✅';
       document.getElementById('r-title').textContent = '一致！';
       document.getElementById('r-sub').textContent = '正しいボトルです\n補充してください';
-      document.getElementById('r-detail').textContent = '機器ラベル：' + i1.name + '（' + i1.product + '）\nボトルラベル：' + i2.name + '（' + i2.product + '）';
+      document.getElementById('r-detail').textContent =
+        '機器ラベル：' + i1.name + '（' + i1.product + '）\nボトルラベル：' + i2.name + '（' + i2.product + '）';
     } else {
       overlay.classList.add('ng');
       document.getElementById('r-icon').textContent = '❌';
       document.getElementById('r-title').textContent = '取り違え！';
       document.getElementById('r-sub').textContent = '直ちに補充を中止してください！';
-      document.getElementById('r-detail').textContent = '機器ラベル：' + i1.name + '（' + i1.product + '）\nボトルラベル：' + i2.name + '（' + i2.product + '）\n\n⚠️ 混合すると塩素ガスが発生します！';
+      document.getElementById('r-detail').textContent =
+        '機器ラベル：' + i1.name + '（' + i1.product + '）\nボトルラベル：' + i2.name + '（' + i2.product + '）\n\n⚠️ 混合すると塩素ガスが発生します！';
     }
   }
 
@@ -346,7 +345,7 @@
     document.getElementById('placeholder').style.display = 'flex';
     document.getElementById('ph-icon').textContent = '🏥';
     document.getElementById('ph-title').textContent = '機器側のラベルを撮影';
-    document.getElementById('ph-sub').textContent = '下の青いボタンでカメラを起動し\n⚠️ ラベルの色部分だけを\n黄色い枠内に近づいて撮影してください';
+    document.getElementById('ph-sub').textContent = '下の青いボタンでカメラを起動\n📌 ラベルの色の部分を\n黄色い枠いっぱいに近づけて撮影';
     setState(STATE.MACHINE_READY);
   }
 </script>
